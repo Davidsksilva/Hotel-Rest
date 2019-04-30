@@ -2,15 +2,13 @@ package com.project.hotelrest;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @Entity
 public class Hotel {
 
-    private @Id @GeneratedValue Long id;
+    private @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) Long id;
     private String name;
     private int stars;
     private String state;
