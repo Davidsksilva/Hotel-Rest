@@ -6,10 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 @Configuration
 @Slf4j
@@ -51,7 +48,8 @@ public class LoadDatabase {
 
                 // Create Hotel entity
                 Hotel hotel = new Hotel (name, stars, uf);
-                log.info("Preloading " + h_repository.save(hotel));
+                h_repository.save(hotel);
+               // log.info("Preloading " + h_repository.save(hotel));
 
                 //Generating Random entry values for Bedroom entities
                 int num_bedrooms = getRandomIntegerBetweenRange(1,20);
@@ -70,35 +68,37 @@ public class LoadDatabase {
                         int age = getRandomIntegerBetweenRange(20,70);
                         int sex_index = getRandomIntegerBetweenRange(0,2);
                         String sex = sex_list.get(sex_index);
-                        Guest guest = new Guest (guest_name, age, sex);
+                        Bedroom bedroom = new Bedroom(j,num_beds, price,true,hotel);
 
-                        log.info("Preloading " + g_repository.save(guest));
+                        Guest guest = new Guest (guest_name, age, sex,bedroom);
 
-                        log.info("Preloading " + br_repository.save(new Bedroom(j,num_beds, price,true,hotel,guest)));
+                        //long id_g = g_repository.save(new Guest (guest_name, age, sex)).getId();
+                        //Guest guest = g_repository.findById(id_g).orElseThrow(() -> new GuestNotFoundException(id_g));
+                        br_repository.save(bedroom);
+                        g_repository.save(guest);
 
+
+                        //long id_b = br_repository.save(new Bedroom(j,num_beds, price,true,hotel)).getId();
+                       // Bedroom bedroom = br_repository.findById(id_b).orElseThrow(() -> new BedroomNotFoundException(id_b));
+
+                       // guest.assignBedroom(bedroom);
+                        //br_repository.save(bedroom);
+                        //g_repository.save(guest);
+
+                       // log.info("Preloading " + id = );
+
+
+                        //log.info("Preloading " + br_repository.save(bedroom));
+
+                        //g_repository.findById()
+                        //guest.assignBedroom(bedroom);
                     }
                     else{
-                        log.info("Preloading " + br_repository.save(new Bedroom(j,num_beds, price,false,hotel,null)));
+                        br_repository.save(new Bedroom(j,num_beds, price,false,hotel));
+                        //log.info("Preloading " + br_repository.save(new Bedroom(j,num_beds, price,false,hotel,null)));
                     }
-
-
                 }
             }
-
-
-            // Generating fake Hotels
-
-
-
-            /*log.info("Preloading " + h_repository.save(new Hotel ("Hotel Cabo Branco", 5, "PB")));
-            Guest guest = new Guest (faker.name().fullName(), 21, "Male");
-            log.info("Preloading " + g_repository.save(guest));
-            List<Hotel> hotels = h_repository.findAll();
-            for( Hotel hotel : hotels){
-                log.info("Preloading " + br_repository.save(new Bedroom(1,1, 100,true,hotel,guest)));
-                log.info("Preloading " + br_repository.save(new Bedroom(2,2, 200,true,hotel,guest)));
-
-            }*/
         };
     }
 }

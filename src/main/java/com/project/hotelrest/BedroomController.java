@@ -117,7 +117,6 @@ public class BedroomController {
         Resource<Bedroom> resource = bedroom_assembler.toResource(bedroom_repo.findById(id_bedroom)
                 .map(bedroom -> {
                     bedroom.setHotel(newBedroom.getHotel());
-                    bedroom.setGuest(newBedroom.getGuest());
                     bedroom.setNum_beds(newBedroom.getNum_beds());
                     bedroom.setNumber(newBedroom.getNumber());
                     bedroom.setPrice(newBedroom.getPrice());

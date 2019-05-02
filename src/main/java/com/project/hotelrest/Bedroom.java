@@ -16,8 +16,9 @@ public class Bedroom {
 
     @ManyToOne
     private Hotel hotel;
-    @ManyToOne
-    private Guest guest;
+    //@ManyToOne(cascade=CascadeType.ALL)
+    //@ManyToOne
+    //private Guest guest;
 
     public Bedroom(){
         num_beds = 1;
@@ -29,15 +30,6 @@ public class Bedroom {
         this.num_beds = num_beds;
         this.price = price;
         this.occupied = occupied;
-    }
-
-    public Bedroom(int number,int num_beds, float price, boolean occupied, Hotel hotel, Guest guest){
-        this.number = number;
-        this.num_beds = num_beds;
-        this.price = price;
-        this.occupied = occupied;
-        this.hotel = hotel;
-        this.guest = guest;
     }
 
     public Bedroom(int number,int num_beds, float price, boolean occupied, Hotel hotel){

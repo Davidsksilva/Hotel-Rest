@@ -2,10 +2,10 @@ package com.project.hotelrest;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -16,16 +16,24 @@ public class Guest {
     private int age;
     private String sex;
 
+    //@OneToOne(cascade=CascadeType.ALL, mappedBy="guest")
+    @ManyToOne
+    private Bedroom bedroom;
+
+
     public Guest(){
         this.name = "John Doe";
         this.age = 10;
         this.sex = "Male";
     }
 
-    public Guest(String name, int age, String sex){
+    public Guest(String name, int age, String sex, Bedroom bedroom){
         this.name = name;
         this.age = age;
         this.sex = sex;
+        this.bedroom = bedroom;
     }
+
+
 
 }
