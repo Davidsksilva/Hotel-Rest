@@ -2,11 +2,11 @@ package com.project.hotelrest;
 
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,10 +19,12 @@ public class GuestController {
     private final GuestRepository guest_repo;
     private final BedroomRepository bedroom_repo;
     private final GuestResourceAssembler guest_assembler;
+    private final HotelRepository hotel_repo;
 
-    GuestController(GuestRepository guest_repo, BedroomRepository bedroom_repo, GuestResourceAssembler guest_assembler){
+    GuestController(GuestRepository guest_repo, BedroomRepository bedroom_repo, HotelRepository hotel_repo,GuestResourceAssembler guest_assembler){
         this.bedroom_repo = bedroom_repo;
         this.guest_repo = guest_repo;
+        this.hotel_repo = hotel_repo;
         this.guest_assembler = guest_assembler;
     }
 
@@ -58,5 +60,18 @@ public class GuestController {
         return guest_assembler.toResource(guest);
 
     }
+
+    // Create Guest
+    @PostMapping(value = "/hotels/{id}/guests", produces = "application/json; charset=UTF-8")
+    ResponseEntity<?> newGuest(@RequestBody Guest newGuest, @PathVariable Long id) throws URISyntaxException {
+        Hotel hotel = hotel_repo.findById(id)
+                .orElseThrow(() -> new HotelNotFoundException(id));
+        Resource<Guest> resource = guest_assembler.toResource(guest_repo.save(newGuest));
+
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
+    }
+
 
 }
