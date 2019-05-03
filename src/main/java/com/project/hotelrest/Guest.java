@@ -20,7 +20,6 @@ public class Guest {
     @ManyToOne
     private Bedroom bedroom;
 
-
     public Guest(){
         this.name = "John Doe";
         this.age = 10;

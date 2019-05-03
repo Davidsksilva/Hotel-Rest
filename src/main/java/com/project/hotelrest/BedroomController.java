@@ -27,7 +27,7 @@ public class BedroomController {
     }
 
     // List Bedrooms
-    @GetMapping(value = "/bedrooms", produces = "application/json; charset=UTF-8")
+    @GetMapping(value = "/quartos", produces = "application/json; charset=UTF-8")
     public Resources<Resource<Bedroom>> allBedroomsRoot (@RequestParam(value="occupation", defaultValue="all") String occupation){
 
         List<Resource<Bedroom>> bedrooms_resource;
@@ -52,7 +52,7 @@ public class BedroomController {
     }
 
     // Select Bedroom
-    @GetMapping(value = "/bedrooms/{id_bedroom}", produces = "application/json; charset=UTF-8")
+    @GetMapping(value = "/quartos/{id_bedroom}", produces = "application/json; charset=UTF-8")
     Resource<Bedroom> oneBedroomRoot (@PathVariable Long id_bedroom){
 
         Bedroom bedroom = bedroom_repo.findById(id_bedroom)
@@ -62,7 +62,7 @@ public class BedroomController {
     }
 
     // List Bedrooms
-    @GetMapping(value = "/hotels/{id}/bedrooms", produces = "application/json; charset=UTF-8")
+    @GetMapping(value = "/hoteleis/{id}/quartos", produces = "application/json; charset=UTF-8")
     public Resources<Resource<Bedroom>> allBedrooms (@RequestParam(value="occupation", defaultValue="all") String occupation,@PathVariable Long id){
 
         List<Resource<Bedroom>> bedrooms_resource;
@@ -83,11 +83,11 @@ public class BedroomController {
                 .collect(Collectors.toList());
 
         return new Resources<>(bedrooms_resource,
-                linkTo(methodOn(BedroomController.class).allBedrooms(null,id)).withSelfRel());
+                linkTo(methodOn(BedroomController.class).allBedrooms(occupation,id)).withSelfRel());
     }
 
     // Select Bedroom
-    @GetMapping(value = "/hotels/{id_hotel}/bedrooms/{num_bedroom}", produces = "application/json; charset=UTF-8")
+    @GetMapping(value = "/hoteis/{id_hotel}/quartos/{num_bedroom}", produces = "application/json; charset=UTF-8")
     Resource<Bedroom> oneBedroom (@PathVariable("id_hotel") Long id_hotel,
                                   @PathVariable("num_bedroom") int num_bedroom){
 
@@ -97,7 +97,7 @@ public class BedroomController {
     }
 
     // Create Bedroom
-    @PostMapping(value = "/hotels/{id}/bedrooms", produces = "application/json; charset=UTF-8")
+    @PostMapping(value = "/hotel/{id}/quarto", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> newBedroom(@RequestBody Bedroom newBedroom, @PathVariable Long id) throws URISyntaxException {
         Hotel hotel = hotel_repo.findById(id)
                 .orElseThrow(() -> new HotelNotFoundException(id));
@@ -110,7 +110,7 @@ public class BedroomController {
     }
 
     // Change Bedroom Data, most importantly its occupation
-    @PutMapping(value = "/hotels/{id_hotel}/bedrooms/{id_bedroom}", produces = "application/json; charset=UTF-8")
+    @PutMapping(value = "/hoteis/{id_hotel}/quartos/{id_bedroom}", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> changeBedroom(@RequestBody Bedroom newBedroom, @PathVariable("id_hotel") Long id_hotel,
                                     @PathVariable("id_bedroom") Long id_bedroom) throws URISyntaxException{
 

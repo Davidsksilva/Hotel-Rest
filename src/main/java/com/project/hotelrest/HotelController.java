@@ -29,7 +29,7 @@ public class HotelController {
     }
 
     // List Hotels
-    @GetMapping(value = "/hotels", produces = "application/json; charset=UTF-8")
+    @GetMapping(value = "/hoteis", produces = "application/json; charset=UTF-8")
     Resources<Resource<Hotel>> all() {
 
         List<Resource<Hotel>> hotels = hotel_repo.findAll().stream()
@@ -40,7 +40,7 @@ public class HotelController {
     }
 
     // Select Hotel
-    @GetMapping(value = "/hotels/{id}", produces = "application/json; charset=UTF-8")
+    @GetMapping(value = "/hoteis/{id}", produces = "application/json; charset=UTF-8")
     public Resource<Hotel> one (@PathVariable Long id){
         Hotel hotel = hotel_repo.findById(id)
                 .orElseThrow(() -> new HotelNotFoundException(id));
@@ -49,7 +49,7 @@ public class HotelController {
     }
 
     // Create Hotel
-    @PostMapping("/hotels")
+    @PostMapping("/hoteis")
     ResponseEntity<?> newHotel(@RequestBody Hotel newHotel) throws URISyntaxException {
 
         Resource<Hotel> resource = hotel_assembler.toResource(hotel_repo.save(newHotel));
@@ -60,7 +60,7 @@ public class HotelController {
     }
 
     // Change Hotel data
-    @PutMapping(value = "/hotels/{id}", produces = "application/json; charset=UTF-8")
+    @PutMapping(value = "/hoteis/{id}", produces = "application/json; charset=UTF-8")
     Hotel replaceHotel(@RequestBody Hotel newHotel, @PathVariable Long id){
         return hotel_repo.findById(id)
                 .map(hotel -> {
@@ -76,7 +76,7 @@ public class HotelController {
     }
 
     // Delete Hotel by id
-    @DeleteMapping(value = "/hotels/{id}", produces = "application/json; charset=UTF-8")
+    @DeleteMapping(value = "/hoteis/{id}", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> deleteHotel(@PathVariable Long id){
         hotel_repo.deleteById(id);
 

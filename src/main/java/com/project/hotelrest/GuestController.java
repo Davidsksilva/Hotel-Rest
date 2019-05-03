@@ -29,7 +29,7 @@ public class GuestController {
     }
 
     // List Guests
-   @GetMapping(value = "/hotels/{id}/guests", produces = "application/json; charset=UTF-8")
+   @GetMapping(value = "/hoteis/{id}/hospedes", produces = "application/json; charset=UTF-8")
     //public Resources<Resource<Guest>> all (@PathVariable Long id){
     public Resources<Resource<Guest>> allGuests (@PathVariable Long id){
 
@@ -48,7 +48,7 @@ public class GuestController {
 
     }
 
-    @GetMapping(value = "/hotels/{id_hotel}/guests/{id_guest}", produces = "application/json; charset=UTF-8")
+    @GetMapping(value = "/hoteis/{id_hotel}/hospedes/{id_guest}", produces = "application/json; charset=UTF-8")
     //public Resources<Resource<Guest>> all (@PathVariable Long id){
     public Resource<Guest> oneGuest (@PathVariable("id_hotel") Long id_hotel,
                                  @PathVariable("id_guest") Long id_guest){
@@ -62,7 +62,7 @@ public class GuestController {
     }
 
     // Create Guest
-    @PostMapping(value = "/hotels/{id}/guests", produces = "application/json; charset=UTF-8")
+    @PostMapping(value = "/hoteis/{id}/hospedes", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> newGuest(@RequestBody Guest newGuest, @PathVariable Long id) throws URISyntaxException {
         Hotel hotel = hotel_repo.findById(id)
                 .orElseThrow(() -> new HotelNotFoundException(id));
