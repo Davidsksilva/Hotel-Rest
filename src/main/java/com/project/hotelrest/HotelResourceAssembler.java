@@ -13,6 +13,6 @@ public class HotelResourceAssembler implements ResourceAssembler<Hotel, Resource
     public Resource<Hotel> toResource(Hotel hotel){
         return new Resource<>(hotel,
                 linkTo(methodOn(HotelController.class).one(hotel.getId())).withSelfRel(),
-                linkTo(methodOn(HotelController.class).all()).withRel("hotels"));
+                linkTo(methodOn(HotelController.class).all("all")).withRel("hotels"));
     }
 }

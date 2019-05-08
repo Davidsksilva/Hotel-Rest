@@ -30,13 +30,23 @@ public class HotelController {
 
     // List Hotels
     @GetMapping(value = "/hoteis", produces = "application/json; charset=UTF-8")
-    Resources<Resource<Hotel>> all() {
+    Resources<Resource<Hotel>> all(@RequestParam(value = "location", defaultValue = "all") String location) {
 
-        List<Resource<Hotel>> hotels = hotel_repo.findAll().stream()
-                .map(hotel_assembler::toResource)
-                .collect(Collectors.toList());
-        return new Resources<>(hotels,
-                linkTo(methodOn(HotelController.class).all()).withSelfRel());
+        if(location.equals("all")){
+            List<Resource<Hotel>> hotels = hotel_repo.findAll().stream()
+                    .map(hotel_assembler::toResource)
+                    .collect(Collectors.toList());
+            return new Resources<>(hotels,
+                    linkTo(methodOn(HotelController.class).all(location)).withSelfRel());
+        }
+        else{
+            List<Resource<Hotel>> hotels = hotel_repo.findHotelsByState(location).stream()
+                    .map(hotel_assembler::toResource)
+                    .collect(Collectors.toList());
+            return new Resources<>(hotels,
+                    linkTo(methodOn(HotelController.class).all(location)).withSelfRel());
+
+        }
     }
 
     // Select Hotel
