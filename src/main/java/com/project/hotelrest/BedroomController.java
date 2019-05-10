@@ -62,7 +62,7 @@ public class BedroomController {
     }
 
     // List Bedrooms
-    @GetMapping(value = "/hoteleis/{id}/quartos", produces = "application/json; charset=UTF-8")
+    @GetMapping(value = "/hoteis/{id}/quartos", produces = "application/json; charset=UTF-8")
     public Resources<Resource<Bedroom>> allBedrooms (@RequestParam(value="occupation", defaultValue="all") String occupation,@PathVariable Long id){
 
         List<Resource<Bedroom>> bedrooms_resource;

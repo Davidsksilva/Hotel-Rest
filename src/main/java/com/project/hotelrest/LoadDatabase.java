@@ -46,13 +46,15 @@ public class LoadDatabase {
                 String uf = uf_list.get(uf_index);
                 String name = faker.company().name();
 
-                // Create Hotel entity
-                Hotel hotel = new Hotel (name, stars, uf);
-                h_repository.save(hotel);
+
                // log.info("Preloading " + h_repository.save(hotel));
 
                 //Generating Random entry values for Bedroom entities
                 int num_bedrooms = getRandomIntegerBetweenRange(1,20);
+
+                // Create Hotel entity
+                Hotel hotel = new Hotel (name, stars, uf);
+                h_repository.save(hotel);
 
                 // Bedroom Loop
                 for(int j = 1; j <= num_bedrooms; j++){
