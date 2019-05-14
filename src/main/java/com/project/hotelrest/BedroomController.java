@@ -63,13 +63,19 @@ public class BedroomController {
 
     // List Bedrooms
     @GetMapping(value = "/hoteis/{id}/quartos", produces = "application/json; charset=UTF-8")
-    public Resources<Resource<Bedroom>> allBedrooms (@RequestParam(value="occupation", defaultValue="all") String occupation,@PathVariable Long id){
+    public Resources<Resource<Bedroom>> allBedrooms (@RequestParam(value="occupation", defaultValue="all") String occupation,
+            @RequestParam(value="min_beds", defaultValue="0") int min_beds ,@PathVariable Long id){
 
         List<Resource<Bedroom>> bedrooms_resource;
         List<Bedroom> bedrooms;
 
         if(occupation.equals("free")){
-            bedrooms = bedroom_repo.findByHotelIdByOccupation(id,false);
+            if(min_beds != 0){
+                bedrooms = bedroom_repo.findByHotelIdOccupiedRooms(id,false,min_beds);
+            }
+            else{
+                bedrooms = bedroom_repo.findBedroomsByHotel_IdAndOccupied(id,false);
+            }
         }
         else if(occupation.equals("occupied")){
             bedrooms = bedroom_repo.findByHotelIdByOccupation(id,true);
@@ -83,7 +89,7 @@ public class BedroomController {
                 .collect(Collectors.toList());
 
         return new Resources<>(bedrooms_resource,
-                linkTo(methodOn(BedroomController.class).allBedrooms(occupation,id)).withSelfRel());
+                linkTo(methodOn(BedroomController.class).allBedrooms(occupation,min_beds,id)).withSelfRel());
     }
 
     // Select Bedroom

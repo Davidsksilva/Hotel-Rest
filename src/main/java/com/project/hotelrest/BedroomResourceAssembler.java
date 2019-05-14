@@ -14,7 +14,7 @@ public class BedroomResourceAssembler implements ResourceAssembler<Bedroom, Reso
 
         return new Resource<>(bedroom,
                 linkTo(methodOn(BedroomController.class).oneBedroom (bedroom.getHotel().getId(),bedroom.getNumber())).withSelfRel(),
-                linkTo(methodOn(BedroomController.class).allBedrooms(null,bedroom.getHotel().getId())).withRel("bedrooms"));
+                linkTo(methodOn(BedroomController.class).allBedrooms(null,0, bedroom.getHotel().getId())).withRel("bedrooms"));
     }
 
 
