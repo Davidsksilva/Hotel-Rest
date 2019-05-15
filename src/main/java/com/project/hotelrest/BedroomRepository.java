@@ -22,4 +22,5 @@ public interface BedroomRepository extends JpaRepository<Bedroom, Long> {
 
     List<Bedroom> findBedroomsByHotel_IdAndOccupied(Long id_hotel, boolean occupied);
 
+    Bedroom findBedroomByHotel_IdAndNumber(Long id_hotel, int bedroom_num);
 }

@@ -18,12 +18,18 @@ public class BedroomController {
 
     private final BedroomRepository bedroom_repo;
     private final HotelRepository hotel_repo;
-    private final BedroomResourceAssembler bedroom_assembler;
+    private final GuestRepository guest_repo;
 
-    BedroomController(BedroomRepository bedroom_repo, HotelRepository hotel_repo, BedroomResourceAssembler bedroom_assembler){
+    private final BedroomResourceAssembler bedroom_assembler;
+    private final GuestResourceAssembler guest_assembler;
+
+    BedroomController(BedroomRepository bedroom_repo, HotelRepository hotel_repo, GuestRepository guest_repo,
+                      BedroomResourceAssembler bedroom_assembler, GuestResourceAssembler guest_assembler){
         this.bedroom_repo = bedroom_repo;
         this.hotel_repo = hotel_repo;
+        this.guest_repo = guest_repo;
         this.bedroom_assembler = bedroom_assembler;
+        this.guest_assembler= guest_assembler;
     }
 
     // List Bedrooms
@@ -109,6 +115,24 @@ public class BedroomController {
                 .orElseThrow(() -> new HotelNotFoundException(id));
         newBedroom.setHotel(hotel);
         Resource<Bedroom> resource = bedroom_assembler.toResource(bedroom_repo.save(newBedroom));
+
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
+    }
+
+    // Create Guest on Bedroom
+    @PostMapping(value = "/hotel/{id_hotel}/quartos/{num_bedroom}", produces = "application/json; charset=UTF-8")
+    ResponseEntity<?> newGuestOnBedroom(@RequestBody Guest newGuest,
+                                        @PathVariable("id_hotel") Long id_hotel,
+                                        @PathVariable("num_bedroom") int num_bedroom) throws URISyntaxException {
+        Bedroom bedroom = bedroom_repo.findBedroomByHotel_IdAndNumber(id_hotel,num_bedroom);
+
+        newGuest.setBedroom(bedroom);
+        bedroom.setOccupied(true);
+        bedroom_repo.save(bedroom);
+
+        Resource<Guest> resource = guest_assembler.toResource(guest_repo.save(newGuest));
 
         return ResponseEntity
                 .created(new URI(resource.getId().expand().getHref()))

@@ -22,7 +22,7 @@ public class LoadDatabase {
     }
 
     // Populate Database
-    @Bean
+    //@Bean
     CommandLineRunner initDatabase(HotelRepository h_repository, BedroomRepository br_repository, GuestRepository g_repository){
         return args ->{
 
