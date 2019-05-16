@@ -128,15 +128,23 @@ public class BedroomController {
                                         @PathVariable("num_bedroom") int num_bedroom) throws URISyntaxException {
         Bedroom bedroom = bedroom_repo.findBedroomByHotel_IdAndNumber(id_hotel,num_bedroom);
 
-        newGuest.setBedroom(bedroom);
-        bedroom.setOccupied(true);
-        bedroom_repo.save(bedroom);
+        if(!bedroom.getOccupied()){
 
-        Resource<Guest> resource = guest_assembler.toResource(guest_repo.save(newGuest));
+            newGuest.setBedroom(bedroom);
+            bedroom.setOccupied(true);
+            bedroom_repo.save(bedroom);
+            Resource resource = guest_assembler.toResource(guest_repo.save(newGuest));
+            return ResponseEntity
+                    .created(new URI(resource.getId().expand().getHref()))
+                    .body(resource);
 
-        return ResponseEntity
-                .created(new URI(resource.getId().expand().getHref()))
-                .body(resource);
+        }
+        else{
+            return ResponseEntity.created(new URI("/hotel/" + id_hotel + "/quarto/" + num_bedroom))
+                    .body(null);
+        }
+
+
     }
 
     // Change Bedroom Data, most importantly its occupation

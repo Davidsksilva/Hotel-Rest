@@ -14,22 +14,19 @@ public class Guest {
     private @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)  Long id;
     private String name;
     private int age;
-    private String sex;
+    private String gender;
 
-    //@OneToOne(cascade=CascadeType.ALL, mappedBy="guest")
     @ManyToOne
     private Bedroom bedroom;
 
     public Guest(){
-        this.name = "John Doe";
-        this.age = 10;
-        this.sex = "Male";
+
     }
 
-    public Guest(String name, int age, String sex, Bedroom bedroom){
+    public Guest(String name, int age, String gender, Bedroom bedroom){
         this.name = name;
         this.age = age;
-        this.sex = sex;
+        this.gender = gender;
         this.bedroom = bedroom;
     }
 
