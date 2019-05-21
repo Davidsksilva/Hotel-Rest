@@ -20,11 +20,14 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 public class HotelController {
 
     private final HotelRepository hotel_repo;
+    private final BedroomRepository bedroom_repo;
+
     private final HotelResourceAssembler hotel_assembler;
 
 
-    HotelController(HotelRepository hotel_repo, HotelResourceAssembler hotel_assembler){
+    HotelController(HotelRepository hotel_repo,BedroomRepository bedroom_repo, HotelResourceAssembler hotel_assembler){
         this.hotel_repo = hotel_repo;
+        this.bedroom_repo = bedroom_repo;
         this.hotel_assembler = hotel_assembler;
     }
 
@@ -56,6 +59,38 @@ public class HotelController {
                 .orElseThrow(() -> new HotelNotFoundException(id));
 
         return hotel_assembler.toResource(hotel);
+    }
+
+    // Statistics
+    @GetMapping(value = "/hoteis/estatistica", produces = "application/json; charset=UTF-8")
+    public HotelStatistic allHotelsStatistics (@RequestParam(value = "location", defaultValue = "all") String location){
+
+        List<Hotel> hotels;
+        HotelStatistic hotel_stats = new HotelStatistic();
+
+        if(location.equals("all")){
+           hotels = hotel_repo.findAll();
+        }
+        else{
+            hotels = hotel_repo.findHotelsByState(location);
+        }
+        hotel_stats.setHotel_count(hotels.size());
+        hotel_stats.setLocation(location);
+
+        int occupiedBedroomCount = 0;
+        int bedroomCount = 0;
+        for(int i = 0; i < hotels.size(); i++){
+
+            occupiedBedroomCount += bedroom_repo.countOccupiedBedroomsInHotel(hotels.get(i));
+            bedroomCount += bedroom_repo.countBedroomsInHotel(hotels.get(i));
+        }
+
+        hotel_stats.setBedroom_count(bedroomCount);
+        hotel_stats.setOccupied_bedroom_count(occupiedBedroomCount);
+        hotel_stats.setOccupation((occupiedBedroomCount/bedroomCount)*100);
+
+        return hotel_stats;
+
     }
 
     // Create Hotel
