@@ -67,12 +67,18 @@ public class HotelController {
 
         List<Hotel> hotels;
         HotelStatistic hotel_stats = new HotelStatistic();
+        float avgPrice;
+        float revenue;
 
         if(location.equals("all")){
            hotels = hotel_repo.findAll();
+           avgPrice = bedroom_repo.avgPrice();
+           revenue = bedroom_repo.sumSold();
         }
         else{
             hotels = hotel_repo.findHotelsByState(location);
+            avgPrice = bedroom_repo.avgPriceByLocation(location);
+            revenue = bedroom_repo.sumSoldByLocation(location);
         }
         hotel_stats.setHotel_count(hotels.size());
         hotel_stats.setLocation(location);
@@ -85,9 +91,14 @@ public class HotelController {
             bedroomCount += bedroom_repo.countBedroomsInHotel(hotels.get(i));
         }
 
+
+
+        hotel_stats.setAverage_price(avgPrice);
+        hotel_stats.setRevenue(revenue);
         hotel_stats.setBedroom_count(bedroomCount);
         hotel_stats.setOccupied_bedroom_count(occupiedBedroomCount);
-        hotel_stats.setOccupation((occupiedBedroomCount/bedroomCount)*100);
+        float occupation = ((float)occupiedBedroomCount/(float)bedroomCount);
+        hotel_stats.setOccupation(occupation*100);
 
         return hotel_stats;
 

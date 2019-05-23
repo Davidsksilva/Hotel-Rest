@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,40 @@ public class GuestController {
         return guest_assembler.toResource(guest);
 
     }
+
+    // Statistics
+    @GetMapping( value = "/hospedes/estatistica", produces = "application/json; charset=UTF-8")
+    public GuestStatistic guestsStatistic(@RequestParam(value = "location", defaultValue = "all") String location){
+
+        List<Hotel> hotels;
+        List<Bedroom> bedrooms = new ArrayList<Bedroom>();
+        GuestStatistic guest_stats = new GuestStatistic();
+
+        if(location.equals("all")){
+            hotels = hotel_repo.findAll();
+        }
+        else{
+            hotels = hotel_repo.findHotelsByState(location);
+        }
+
+        int other_count = 0;
+        int male_count = 0;
+        int female_count = 0;
+
+        for(int i = 0; i < hotels.size(); i++) {
+            other_count += guest_repo.countGuestByGenderAndBedroom_Hotel_Id("Other", hotels.get(i).getId());
+            male_count += guest_repo.countGuestByGenderAndBedroom_Hotel_Id("Male", hotels.get(i).getId());
+            female_count += guest_repo.countGuestByGenderAndBedroom_Hotel_Id("Female", hotels.get(i).getId());
+        }
+
+        guest_stats.setGender_female_count(female_count);
+        guest_stats.setGender_male_count(male_count);
+        guest_stats.setGender_other_count(other_count);
+
+        return guest_stats;
+
+    }
+
 
     // Create Guest
     @PostMapping(value = "/hoteis/{id}/hospedes", produces = "application/json; charset=UTF-8")

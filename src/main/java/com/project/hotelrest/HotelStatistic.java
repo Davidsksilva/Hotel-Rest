@@ -10,6 +10,8 @@ public class HotelStatistic {
     private float occupation;
     private int bedroom_count;
     private int occupied_bedroom_count;
+    private float revenue;
+    private float average_price;
 
 
     HotelStatistic(){
