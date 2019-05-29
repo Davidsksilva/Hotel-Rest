@@ -17,30 +17,31 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RestController
 public class GuestController {
 
-    private final GuestRepository guest_repo;
-    private final BedroomRepository bedroom_repo;
-    private final GuestResourceAssembler guest_assembler;
-    private final HotelRepository hotel_repo;
+    private final GuestRepository guestRepository;
+    private final GuestResourceAssembler guestResourceAssembler;
+    private final HotelRepository hotelRepository;
 
-    GuestController(GuestRepository guest_repo, BedroomRepository bedroom_repo, HotelRepository hotel_repo,GuestResourceAssembler guest_assembler){
-        this.bedroom_repo = bedroom_repo;
-        this.guest_repo = guest_repo;
-        this.hotel_repo = hotel_repo;
-        this.guest_assembler = guest_assembler;
+    GuestController(GuestRepository guestRepository, HotelRepository hotelRepository, GuestResourceAssembler guestResourceAssembler){
+        this.guestRepository = guestRepository;
+        this.hotelRepository = hotelRepository;
+        this.guestResourceAssembler = guestResourceAssembler;
     }
 
-    // List Guests
-   @GetMapping(value = "/hoteis/{id}/hospedes", produces = "application/json; charset=UTF-8")
-    //public Resources<Resource<Guest>> all (@PathVariable Long id){
+    /**
+     * List Guests
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/hoteis/{id}/hospedes", produces = "application/json; charset=UTF-8")
     public Resources<Resource<Guest>> allGuests (@PathVariable Long id){
 
         List<Resource<Guest>> guests_resource;
         List<Guest> guests;
 
-        guests = guest_repo.findGuestsByBedroom_Hotel_Id(id);
+        guests = guestRepository.findGuestsByBedroom_Hotel_Id(id);
 
         guests_resource = guests.stream()
-                .map(guest_assembler::toResource)
+                .map(guestResourceAssembler::toResource)
                 .collect(Collectors.toList());
 
 
@@ -49,20 +50,29 @@ public class GuestController {
 
     }
 
+    /**
+     *
+     * @param id_hotel
+     * @param id_guest
+     * @return
+     */
     @GetMapping(value = "/hoteis/{id_hotel}/hospedes/{id_guest}", produces = "application/json; charset=UTF-8")
-    //public Resources<Resource<Guest>> all (@PathVariable Long id){
     public Resource<Guest> oneGuest (@PathVariable("id_hotel") Long id_hotel,
                                  @PathVariable("id_guest") Long id_guest){
 
-        Guest guest = guest_repo.findById(id_guest).orElseThrow(() -> new GuestNotFoundException(id_guest));
+        Guest guest = guestRepository.findById(id_guest).orElseThrow(() -> new GuestNotFoundException(id_guest));
 
 
 
-        return guest_assembler.toResource(guest);
+        return guestResourceAssembler.toResource(guest);
 
     }
 
-    // Statistics
+    /**
+     * Statistics
+     * @param location
+     * @return
+     */
     @GetMapping( value = "/hospedes/estatistica", produces = "application/json; charset=UTF-8")
     public GuestStatistic guestsStatistic(@RequestParam(value = "location", defaultValue = "all") String location){
 
@@ -71,10 +81,10 @@ public class GuestController {
         GuestStatistic guest_stats = new GuestStatistic();
 
         if(location.equals("all")){
-            hotels = hotel_repo.findAll();
+            hotels = hotelRepository.findAll();
         }
         else{
-            hotels = hotel_repo.findHotelsByState(location);
+            hotels = hotelRepository.findHotelsByState(location);
         }
 
         int other_count = 0;
@@ -82,9 +92,9 @@ public class GuestController {
         int female_count = 0;
 
         for(int i = 0; i < hotels.size(); i++) {
-            other_count += guest_repo.countGuestByGenderAndBedroom_Hotel_Id("Other", hotels.get(i).getId());
-            male_count += guest_repo.countGuestByGenderAndBedroom_Hotel_Id("Male", hotels.get(i).getId());
-            female_count += guest_repo.countGuestByGenderAndBedroom_Hotel_Id("Female", hotels.get(i).getId());
+            other_count += guestRepository.countGuestByGenderAndBedroom_Hotel_Id("Other", hotels.get(i).getId());
+            male_count += guestRepository.countGuestByGenderAndBedroom_Hotel_Id("Male", hotels.get(i).getId());
+            female_count += guestRepository.countGuestByGenderAndBedroom_Hotel_Id("Female", hotels.get(i).getId());
         }
 
         guest_stats.setGender_female_count(female_count);
@@ -96,12 +106,18 @@ public class GuestController {
     }
 
 
-    // Create Guest
+    /**
+     *
+     * @param newGuest
+     * @param id
+     * @return
+     * @throws URISyntaxException
+     */
     @PostMapping(value = "/hoteis/{id}/hospedes", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> newGuest(@RequestBody Guest newGuest, @PathVariable Long id) throws URISyntaxException {
-        Hotel hotel = hotel_repo.findById(id)
+        Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new HotelNotFoundException(id));
-        Resource<Guest> resource = guest_assembler.toResource(guest_repo.save(newGuest));
+        Resource<Guest> resource = guestResourceAssembler.toResource(guestRepository.save(newGuest));
 
         return ResponseEntity
                 .created(new URI(resource.getId().expand().getHref()))

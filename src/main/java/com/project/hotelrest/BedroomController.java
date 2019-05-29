@@ -23,6 +23,14 @@ public class BedroomController {
     private final BedroomResourceAssembler bedroom_assembler;
     private final GuestResourceAssembler guest_assembler;
 
+    /**
+     * Constructor function.
+     * @param bedroom_repo the Bedroom entity Repository.
+     * @param hotel_repo the Hotel entity Repository.
+     * @param guest_repo the Guest entity Repository.
+     * @param bedroom_assembler the assembler to transform the Bedroom entity into a Resource.
+     * @param guest_assembler the assembler to transform the Guest entity into a Resource.
+     */
     BedroomController(BedroomRepository bedroom_repo, HotelRepository hotel_repo, GuestRepository guest_repo,
                       BedroomResourceAssembler bedroom_assembler, GuestResourceAssembler guest_assembler){
         this.bedroom_repo = bedroom_repo;
@@ -32,7 +40,11 @@ public class BedroomController {
         this.guest_assembler= guest_assembler;
     }
 
-    // List Bedrooms
+    /**
+     * Endpoint to list all bedrooms on the Repository, filtered by occupation. Not using the hotel path.
+     * @param occupation String, "all" lists all bedrooms, "occupied" only occupied bedrooms and "free" only available bedrooms.
+     * @return Resource containing a list of Bedroom resources, with corresponding hyperlinks.
+     */
     @GetMapping(value = "/quartos", produces = "application/json; charset=UTF-8")
     public Resources<Resource<Bedroom>> allBedroomsRoot (@RequestParam(value="occupation", defaultValue="all") String occupation){
 
@@ -57,7 +69,11 @@ public class BedroomController {
                 linkTo(methodOn(BedroomController.class).allBedroomsRoot(null)).withSelfRel());
     }
 
-    // Select Bedroom
+    /**
+     * Endpoint to get a single Bedroom by its id on the Repository. Not using the hotel path.
+     * @param id_bedroom id of the hotel in the Repository.
+     * @return Resource containing the referred Bedroom.
+     */
     @GetMapping(value = "/quartos/{id_bedroom}", produces = "application/json; charset=UTF-8")
     Resource<Bedroom> oneBedroomRoot (@PathVariable Long id_bedroom){
 
@@ -67,17 +83,24 @@ public class BedroomController {
         return bedroom_assembler.toResource(bedroom);
     }
 
-    // List Bedrooms
+
+    /**
+     * Endpoint to list all bedrooms in a Hotel.
+     * @param occupation String, "all" lists all bedrooms, "occupied" only occupied bedrooms and "free" only available bedrooms.
+     * @param minBeds Integer, specifying the minimum number of beds that a Bedroom needs to have to be listed.
+     * @param id Long, the id of the Hotel.
+     * @return Resource containing a list of Bedroom resources, with corresponding hyperlinks.
+     */
     @GetMapping(value = "/hoteis/{id}/quartos", produces = "application/json; charset=UTF-8")
     public Resources<Resource<Bedroom>> allBedrooms (@RequestParam(value="occupation", defaultValue="all") String occupation,
-            @RequestParam(value="min_beds", defaultValue="0") int min_beds ,@PathVariable Long id){
+            @RequestParam(value="min_beds", defaultValue="0") int minBeds ,@PathVariable Long id){
 
         List<Resource<Bedroom>> bedrooms_resource;
         List<Bedroom> bedrooms;
 
         if(occupation.equals("free")){
-            if(min_beds != 0){
-                bedrooms = bedroom_repo.findByHotelIdOccupiedRooms(id,false,min_beds);
+            if(minBeds != 0){
+                bedrooms = bedroom_repo.findByHotelIdOccupiedRooms(id,false,minBeds);
             }
             else{
                 bedrooms = bedroom_repo.findBedroomsByHotel_IdAndOccupied(id,false);
@@ -95,10 +118,15 @@ public class BedroomController {
                 .collect(Collectors.toList());
 
         return new Resources<>(bedrooms_resource,
-                linkTo(methodOn(BedroomController.class).allBedrooms(occupation,min_beds,id)).withSelfRel());
+                linkTo(methodOn(BedroomController.class).allBedrooms(occupation,minBeds,id)).withSelfRel());
     }
 
-    // Select Bedroom
+    /**
+     *
+     * @param id_hotel
+     * @param num_bedroom
+     * @return
+     */
     @GetMapping(value = "/hoteis/{id_hotel}/quartos/{num_bedroom}", produces = "application/json; charset=UTF-8")
     Resource<Bedroom> oneBedroom (@PathVariable("id_hotel") Long id_hotel,
                                   @PathVariable("num_bedroom") int num_bedroom){
@@ -108,7 +136,13 @@ public class BedroomController {
         return bedroom_assembler.toResource(bedroom);
     }
 
-    // Create Bedroom
+    /**
+     *
+     * @param newBedroom
+     * @param id
+     * @return
+     * @throws URISyntaxException
+     */
     @PostMapping(value = "/hotel/{id}/quarto", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> newBedroom(@RequestBody Bedroom newBedroom, @PathVariable Long id) throws URISyntaxException {
         Hotel hotel = hotel_repo.findById(id)
@@ -121,7 +155,14 @@ public class BedroomController {
                 .body(resource);
     }
 
-    // Create Guest on Bedroom
+    /**
+     * Endpoint to insert a Guest on a Bedroom.
+     * @param newGuest
+     * @param id_hotel
+     * @param num_bedroom
+     * @return
+     * @throws URISyntaxException
+     */
     @PostMapping(value = "/hotel/{id_hotel}/quartos/{num_bedroom}", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> newGuestOnBedroom(@RequestBody Guest newGuest,
                                         @PathVariable("id_hotel") Long id_hotel,
@@ -147,7 +188,14 @@ public class BedroomController {
 
     }
 
-    // Change Bedroom Data, most importantly its occupation
+    /**
+     * Change Bedroom Data, most importantly its occupation.
+     * @param newBedroom
+     * @param id_hotel
+     * @param id_bedroom
+     * @return
+     * @throws URISyntaxException
+     */
     @PutMapping(value = "/hoteis/{id_hotel}/quartos/{id_bedroom}", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> changeBedroom(@RequestBody Bedroom newBedroom, @PathVariable("id_hotel") Long id_hotel,
                                     @PathVariable("id_bedroom") Long id_bedroom) throws URISyntaxException{
@@ -155,7 +203,7 @@ public class BedroomController {
         Resource<Bedroom> resource = bedroom_assembler.toResource(bedroom_repo.findById(id_bedroom)
                 .map(bedroom -> {
                     bedroom.setHotel(newBedroom.getHotel());
-                    bedroom.setNum_beds(newBedroom.getNum_beds());
+                    bedroom.setNumBeds(newBedroom.getNumBeds());
                     bedroom.setNumber(newBedroom.getNumber());
                     bedroom.setPrice(newBedroom.getPrice());
 

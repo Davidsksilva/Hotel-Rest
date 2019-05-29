@@ -1,40 +1,29 @@
 package com.project.hotelrest;
 
 import lombok.Data;
-import javax.persistence.GenerationType;
 import javax.persistence.*;
 
 @Data
 @Entity
+
 public class Bedroom {
 
-    private @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)  Long id;
+    private @Id @GeneratedValue Long id;
     private int number;
-    private int num_beds;
+    private int numBeds;
     private float price;
     private boolean occupied;
 
     @ManyToOne
     private Hotel hotel;
-    //@ManyToOne(cascade=CascadeType.ALL)
-    //@ManyToOne
-    //private Guest guest;
 
     public Bedroom(){
-        num_beds = 1;
-        price = 100;
-        occupied = false;
+
     }
 
-    public Bedroom(int num_beds, float price, boolean occupied){
-        this.num_beds = num_beds;
-        this.price = price;
-        this.occupied = occupied;
-    }
-
-    public Bedroom(int number,int num_beds, float price, boolean occupied, Hotel hotel){
+    public Bedroom(int number,int numBeds, float price, boolean occupied, Hotel hotel){
         this.number = number;
-        this.num_beds = num_beds;
+        this.numBeds = numBeds;
         this.price = price;
         this.occupied = occupied;
         this.hotel = hotel;

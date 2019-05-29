@@ -1,7 +1,5 @@
 package com.project.hotelrest;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
@@ -19,31 +17,40 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 @RestController
 public class HotelController {
 
-    private final HotelRepository hotel_repo;
-    private final BedroomRepository bedroom_repo;
+    private final HotelRepository hotelRepository;
+    private final BedroomRepository bedroomRepository;
 
     private final HotelResourceAssembler hotel_assembler;
 
-
-    HotelController(HotelRepository hotel_repo,BedroomRepository bedroom_repo, HotelResourceAssembler hotel_assembler){
-        this.hotel_repo = hotel_repo;
-        this.bedroom_repo = bedroom_repo;
+    /**
+     *
+     * @param hotelRepository
+     * @param bedroomRepository
+     * @param hotel_assembler
+     */
+    HotelController(HotelRepository hotelRepository, BedroomRepository bedroomRepository, HotelResourceAssembler hotel_assembler){
+        this.hotelRepository = hotelRepository;
+        this.bedroomRepository = bedroomRepository;
         this.hotel_assembler = hotel_assembler;
     }
 
-    // List Hotels
+    /**
+     * List Hotels
+     * @param location
+     * @return
+     */
     @GetMapping(value = "/hoteis", produces = "application/json; charset=UTF-8")
     Resources<Resource<Hotel>> all(@RequestParam(value = "location", defaultValue = "all") String location) {
 
         if(location.equals("all")){
-            List<Resource<Hotel>> hotels = hotel_repo.findAll().stream()
+            List<Resource<Hotel>> hotels = hotelRepository.findAll().stream()
                     .map(hotel_assembler::toResource)
                     .collect(Collectors.toList());
             return new Resources<>(hotels,
                     linkTo(methodOn(HotelController.class).all(location)).withSelfRel());
         }
         else{
-            List<Resource<Hotel>> hotels = hotel_repo.findHotelsByState(location).stream()
+            List<Resource<Hotel>> hotels = hotelRepository.findHotelsByState(location).stream()
                     .map(hotel_assembler::toResource)
                     .collect(Collectors.toList());
             return new Resources<>(hotels,
@@ -52,16 +59,24 @@ public class HotelController {
         }
     }
 
-    // Select Hotel
+    /**
+     * Select Hotel
+     * @param id
+     * @return
+     */
     @GetMapping(value = "/hoteis/{id}", produces = "application/json; charset=UTF-8")
     public Resource<Hotel> one (@PathVariable Long id){
-        Hotel hotel = hotel_repo.findById(id)
+        Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new HotelNotFoundException(id));
 
         return hotel_assembler.toResource(hotel);
     }
 
-    // Statistics
+    /**
+     * Statistics
+     * @param location
+     * @return
+     */
     @GetMapping(value = "/hoteis/estatistica", produces = "application/json; charset=UTF-8")
     public HotelStatistic allHotelsStatistics (@RequestParam(value = "location", defaultValue = "all") String location){
 
@@ -71,14 +86,14 @@ public class HotelController {
         float revenue;
 
         if(location.equals("all")){
-           hotels = hotel_repo.findAll();
-           avgPrice = bedroom_repo.avgPrice();
-           revenue = bedroom_repo.sumSold();
+           hotels = hotelRepository.findAll();
+           avgPrice = bedroomRepository.avgPrice();
+           revenue = bedroomRepository.sumSold();
         }
         else{
-            hotels = hotel_repo.findHotelsByState(location);
-            avgPrice = bedroom_repo.avgPriceByLocation(location);
-            revenue = bedroom_repo.sumSoldByLocation(location);
+            hotels = hotelRepository.findHotelsByState(location);
+            avgPrice = bedroomRepository.avgPriceByLocation(location);
+            revenue = bedroomRepository.sumSoldByLocation(location);
         }
         hotel_stats.setHotel_count(hotels.size());
         hotel_stats.setLocation(location);
@@ -87,8 +102,8 @@ public class HotelController {
         int bedroomCount = 0;
         for(int i = 0; i < hotels.size(); i++){
 
-            occupiedBedroomCount += bedroom_repo.countOccupiedBedroomsInHotel(hotels.get(i));
-            bedroomCount += bedroom_repo.countBedroomsInHotel(hotels.get(i));
+            occupiedBedroomCount += bedroomRepository.countOccupiedBedroomsInHotel(hotels.get(i));
+            bedroomCount += bedroomRepository.countBedroomsInHotel(hotels.get(i));
         }
 
 
@@ -104,37 +119,51 @@ public class HotelController {
 
     }
 
-    // Create Hotel
+    /**
+     * Create Hotel
+     * @param newHotel
+     * @return
+     * @throws URISyntaxException
+     */
     @PostMapping("/hoteis")
     ResponseEntity<?> newHotel(@RequestBody Hotel newHotel) throws URISyntaxException {
 
-        Resource<Hotel> resource = hotel_assembler.toResource(hotel_repo.save(newHotel));
+        Resource<Hotel> resource = hotel_assembler.toResource(hotelRepository.save(newHotel));
 
         return ResponseEntity
                 .created(new URI(resource.getId().expand().getHref()))
                 .body(resource);
     }
 
-    // Change Hotel data
+    /**
+     * Change Hotel data
+     * @param newHotel
+     * @param id
+     * @return
+     */
     @PutMapping(value = "/hoteis/{id}", produces = "application/json; charset=UTF-8")
     Hotel replaceHotel(@RequestBody Hotel newHotel, @PathVariable Long id){
-        return hotel_repo.findById(id)
+        return hotelRepository.findById(id)
                 .map(hotel -> {
                     hotel.setName(newHotel.getName());
                     hotel.setStars(newHotel.getStars());
                     hotel.setState(newHotel.getState());
-                    return hotel_repo.save(hotel);
+                    return hotelRepository.save(hotel);
                 })
                 .orElseGet(() -> {
                     newHotel.setId(id);
-                    return hotel_repo.save(newHotel);
+                    return hotelRepository.save(newHotel);
                 });
     }
 
-    // Delete Hotel by id
+    /**
+     * Change Hotel data
+     * @param id
+     * @return
+     */
     @DeleteMapping(value = "/hoteis/{id}", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> deleteHotel(@PathVariable Long id){
-        hotel_repo.deleteById(id);
+        hotelRepository.deleteById(id);
 
         return ResponseEntity.noContent().build();
     }

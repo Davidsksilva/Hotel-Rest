@@ -21,7 +21,14 @@ public class LoadDatabase {
         return random.nextBoolean();
     }
 
-    // Populate Database
+    /**
+     * Populate Database
+     * @param h_repository
+     * @param br_repository
+     * @param g_repository
+     * @return
+     */
+
     //@Bean
     CommandLineRunner initDatabase(HotelRepository h_repository, BedroomRepository br_repository, GuestRepository g_repository){
         return args ->{
@@ -39,6 +46,7 @@ public class LoadDatabase {
 
             // UF Loop
             for (int u=0; u < uf_list.size(); u++){
+
                 // Hotel Loop
                 for(int i=0; i<num_hotels; i++){
 
@@ -49,9 +57,6 @@ public class LoadDatabase {
                     int stars = getRandomIntegerBetweenRange(1,5);
                     String uf = uf_list.get(uf_index);
                     String name = faker.company().name();
-
-
-                    // log.info("Preloading " + h_repository.save(hotel));
 
                     //Generating Random entry values for Bedroom entities
                     int num_bedrooms = getRandomIntegerBetweenRange(1,20);
@@ -77,36 +82,15 @@ public class LoadDatabase {
                             Bedroom bedroom = new Bedroom(j,num_beds, price,true,hotel);
 
                             Guest guest = new Guest (guest_name, age, sex,bedroom);
-
-                            //long id_g = g_repository.save(new Guest (guest_name, age, sex)).getId();
-                            //Guest guest = g_repository.findById(id_g).orElseThrow(() -> new GuestNotFoundException(id_g));
                             br_repository.save(bedroom);
                             g_repository.save(guest);
-
-
-                            //long id_b = br_repository.save(new Bedroom(j,num_beds, price,true,hotel)).getId();
-                            // Bedroom bedroom = br_repository.findById(id_b).orElseThrow(() -> new BedroomNotFoundException(id_b));
-
-                            // guest.assignBedroom(bedroom);
-                            //br_repository.save(bedroom);
-                            //g_repository.save(guest);
-
-                            // log.info("Preloading " + id = );
-
-
-                            //log.info("Preloading " + br_repository.save(bedroom));
-
-                            //g_repository.findById()
-                            //guest.assignBedroom(bedroom);
                         }
                         else{
                             br_repository.save(new Bedroom(j,num_beds, price,false,hotel));
-                            //log.info("Preloading " + br_repository.save(new Bedroom(j,num_beds, price,false,hotel,null)));
                         }
                     }
                 }
             }
-
         };
     }
 }

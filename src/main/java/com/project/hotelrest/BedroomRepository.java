@@ -25,9 +25,6 @@ public interface BedroomRepository extends JpaRepository<Bedroom, Long> {
 
     Bedroom findBedroomByHotel_IdAndNumber(Long id_hotel, int bedroom_num);
 
-    @Query("select count(b) from Bedroom b where b.occupied = false and b.hotel = ?1")
-    int countFreeBedroomsInHotel(Hotel hotel);
-
     @Query("select count(b) from Bedroom b where b.occupied = true and b.hotel = ?1")
     int countOccupiedBedroomsInHotel(Hotel hotel);
 
